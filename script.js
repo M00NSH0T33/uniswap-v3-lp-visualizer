@@ -10,6 +10,8 @@ let feeTier = 0.05;
 let priceScale = 'linear';
 let numPositions = 3;
 let charts = {};
+let animationActive = false;
+let animationInterval = null;
 
 // Constants
 const TICK_BASE = 1.0001;
@@ -57,10 +59,12 @@ function setupEventListeners() {
     // Market parameters
     document.getElementById('currentPrice').addEventListener('change', function() {
         currentPrice = parseFloat(this.value);
+        updateVisualizations();
     });
     
     document.getElementById('feeTier').addEventListener('change', function() {
         feeTier = parseFloat(this.value);
+        updateVisualizations();
     });
     
     document.getElementById('priceScale').addEventListener('change', function() {
@@ -107,6 +111,92 @@ function setupEventListeners() {
             });
         });
     });
+    
+    // Add price animation controls
+    document.getElementById('deltaView').insertAdjacentHTML('afterbegin', `
+        <div class="price-animation-controls mb-3">
+            <button id="startAnimation" class="btn btn-sm btn-primary me-2">Animate Price</button>
+            <button id="stopAnimation" class="btn btn-sm btn-danger me-2" disabled>Stop</button>
+            <span class="ms-2">Price Range:</span>
+            <input type="range" id="priceSlider" class="form-range mx-2" style="width: 200px; display: inline-block;" min="0" max="100" value="50">
+            <span id="currentPriceDisplay">$${currentPrice}</span>
+        </div>
+    `);
+    
+    // Add event listeners for animation controls
+    document.getElementById('startAnimation').addEventListener('click', startPriceAnimation);
+    document.getElementById('stopAnimation').addEventListener('click', stopPriceAnimation);
+    document.getElementById('priceSlider').addEventListener('input', updatePriceFromSlider);
+}
+
+/**
+ * Start price animation to show delta changes
+ */
+function startPriceAnimation() {
+    if (animationActive) return;
+    
+    animationActive = true;
+    document.getElementById('startAnimation').disabled = true;
+    document.getElementById('stopAnimation').disabled = false;
+    
+    const minPrice = Math.min(...positions.map(p => p.lowerBound)) * 0.9;
+    const maxPrice = Math.max(...positions.map(p => p.upperBound)) * 1.1;
+    let direction = 1;
+    let animationPrice = currentPrice;
+    
+    // Update slider range
+    const slider = document.getElementById('priceSlider');
+    slider.min = minPrice;
+    slider.max = maxPrice;
+    slider.value = currentPrice;
+    
+    animationInterval = setInterval(() => {
+        // Update price based on direction
+        animationPrice += direction * (maxPrice - minPrice) * 0.01;
+        
+        // Reverse direction at boundaries
+        if (animationPrice >= maxPrice) {
+            direction = -1;
+            animationPrice = maxPrice;
+        } else if (animationPrice <= minPrice) {
+            direction = 1;
+            animationPrice = minPrice;
+        }
+        
+        // Update current price
+        currentPrice = animationPrice;
+        document.getElementById('currentPrice').value = currentPrice.toFixed(0);
+        document.getElementById('currentPriceDisplay').textContent = `$${currentPrice.toFixed(0)}`;
+        slider.value = currentPrice;
+        
+        // Update visualizations
+        updateDeltaChart();
+    }, 100);
+}
+
+/**
+ * Stop price animation
+ */
+function stopPriceAnimation() {
+    if (!animationActive) return;
+    
+    clearInterval(animationInterval);
+    animationActive = false;
+    document.getElementById('startAnimation').disabled = false;
+    document.getElementById('stopAnimation').disabled = true;
+}
+
+/**
+ * Update price from slider
+ */
+function updatePriceFromSlider() {
+    const slider = document.getElementById('priceSlider');
+    currentPrice = parseFloat(slider.value);
+    document.getElementById('currentPrice').value = currentPrice.toFixed(0);
+    document.getElementById('currentPriceDisplay').textContent = `$${currentPrice.toFixed(0)}`;
+    
+    // Update delta chart
+    updateDeltaChart();
 }
 
 /**
@@ -343,6 +433,11 @@ function initializeDeltaChart() {
         .append('div')
         .attr('class', 'tooltip');
     
+    // Add legend
+    const legend = chart.append('g')
+        .attr('class', 'delta-legend')
+        .attr('transform', `translate(${width * 0.6}, 20)`);
+    
     return {
         svg,
         chart,
@@ -354,7 +449,8 @@ function initializeDeltaChart() {
         yGrid,
         tooltip,
         width,
-        height
+        height,
+        legend
     };
 }
 
@@ -733,6 +829,56 @@ function updateDeltaChart() {
         .attr('y', 10)
         .attr('text-anchor', 'middle')
         .text(`Current: $${currentPrice}`);
+    
+    // Update legend
+    chart.legend.selectAll('*').remove();
+    
+    // Add legend items for each position
+    positions.forEach((position, i) => {
+        chart.legend.append('line')
+            .attr('x1', 0)
+            .attr('y1', i * 20)
+            .attr('x2', 20)
+            .attr('y2', i * 20)
+            .attr('class', `position-${position.id}`)
+            .style('stroke-width', 2)
+            .style('fill', 'none');
+        
+        chart.legend.append('text')
+            .attr('x', 25)
+            .attr('y', i * 20 + 5)
+            .text(`Position ${position.id}`);
+    });
+    
+    // Add combined position to legend
+    chart.legend.append('line')
+        .attr('x1', 0)
+        .attr('y1', positions.length * 20)
+        .attr('x2', 20)
+        .attr('y2', positions.length * 20)
+        .attr('class', 'combined-position')
+        .style('stroke-width', 3)
+        .style('fill', 'none');
+    
+    chart.legend.append('text')
+        .attr('x', 25)
+        .attr('y', positions.length * 20 + 5)
+        .text('Combined');
+    
+    // Add delta explanation
+    chart.chart.append('text')
+        .attr('x', chart.width * 0.4)
+        .attr('y', chart.height * 0.2)
+        .attr('class', 'delta-explanation')
+        .attr('text-anchor', 'middle')
+        .text('Delta = 1: 100% token0 (ETH)');
+    
+    chart.chart.append('text')
+        .attr('x', chart.width * 0.4)
+        .attr('y', chart.height * 0.2 + 20)
+        .attr('class', 'delta-explanation')
+        .attr('text-anchor', 'middle')
+        .text('Delta = 0: 100% token1 (USDC)');
 }
 
 /**
