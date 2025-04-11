@@ -1,0 +1,430 @@
+/* 
+ * Uniswap V3 Staggered LP Visualizer
+ * Custom CSS for responsive design and visualization styling
+ */
+
+:root {
+  --primary-color: #ff007a;      /* Uniswap pink */
+  --secondary-color: #5c6bc0;    /* Indigo */
+  --tertiary-color: #00c2ff;     /* Cyan */
+  --success-color: #28a745;      /* Green */
+  --warning-color: #ffc107;      /* Amber */
+  --danger-color: #dc3545;       /* Red */
+  --light-color: #f8f9fa;        /* Light gray */
+  --dark-color: #212529;         /* Dark gray */
+  --background-color: #ffffff;   /* White */
+  --text-color: #212529;         /* Dark gray */
+  --border-color: #dee2e6;       /* Light gray */
+  --chart-grid-color: #e9ecef;   /* Very light gray */
+}
+
+/* Dark mode variables */
+[data-theme="dark"] {
+  --primary-color: #ff007a;      /* Uniswap pink */
+  --secondary-color: #7986cb;    /* Lighter indigo */
+  --tertiary-color: #33d6ff;     /* Lighter cyan */
+  --success-color: #48c774;      /* Lighter green */
+  --warning-color: #ffdd57;      /* Lighter amber */
+  --danger-color: #f14668;       /* Lighter red */
+  --light-color: #2c2c2c;        /* Dark gray */
+  --dark-color: #f8f9fa;         /* Light gray */
+  --background-color: #121212;   /* Very dark gray */
+  --text-color: #f8f9fa;         /* Light gray */
+  --border-color: #444;          /* Medium gray */
+  --chart-grid-color: #333;      /* Dark gray */
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Header styling */
+header {
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)) !important;
+}
+
+/* Card styling */
+.card {
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+  background-color: var(--background-color);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+}
+
+/* Custom card header colors */
+.card-header.bg-primary {
+  background-color: var(--primary-color) !important;
+}
+
+.card-header.bg-success {
+  background-color: var(--success-color) !important;
+}
+
+.card-header.bg-info {
+  background-color: var(--tertiary-color) !important;
+}
+
+.card-header.bg-warning {
+  background-color: var(--warning-color) !important;
+  color: var(--dark-color);
+}
+
+.card-header.bg-secondary {
+  background-color: var(--secondary-color) !important;
+}
+
+/* Form control styling */
+.form-control, .form-select {
+  border-radius: 0.25rem;
+  border: 1px solid var(--border-color);
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(255, 0, 122, 0.25);
+}
+
+/* Range input styling */
+.form-range::-webkit-slider-thumb {
+  background-color: var(--primary-color);
+}
+
+.form-range::-moz-range-thumb {
+  background-color: var(--primary-color);
+}
+
+.form-range::-ms-thumb {
+  background-color: var(--primary-color);
+}
+
+/* Button styling */
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: #d6006a;
+  border-color: #d6006a;
+}
+
+.btn-outline-light {
+  color: var(--light-color);
+  border-color: var(--light-color);
+}
+
+.btn-outline-light:hover {
+  background-color: var(--light-color);
+  color: var(--dark-color);
+}
+
+/* Tab styling */
+.nav-tabs .nav-link {
+  color: var(--text-color);
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  padding: 0.5rem 1rem;
+  margin-right: 0.5rem;
+}
+
+.nav-tabs .nav-link:hover {
+  border-bottom-color: rgba(255, 0, 122, 0.5);
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--primary-color);
+  background-color: transparent;
+  border-bottom-color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* Visualization container styling */
+.visualization-container {
+  height: 400px;
+  width: 100%;
+  position: relative;
+  margin-top: 1rem;
+}
+
+/* Position configuration styling */
+.position-config {
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s ease;
+}
+
+.position-config:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+/* Footer styling */
+footer {
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)) !important;
+}
+
+footer a {
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+/* Accordion styling */
+.accordion-button {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: rgba(255, 0, 122, 0.1);
+  color: var(--primary-color);
+}
+
+.accordion-button:focus {
+  box-shadow: 0 0 0 0.25rem rgba(255, 0, 122, 0.25);
+}
+
+.accordion-body {
+  background-color: var(--background-color);
+}
+
+/* Modal styling */
+.modal-content {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.modal-header {
+  border-bottom-color: var(--border-color);
+}
+
+.modal-footer {
+  border-top-color: var(--border-color);
+}
+
+/* Table styling */
+.table {
+  color: var(--text-color);
+}
+
+.table-sm td, .table-sm th {
+  padding: 0.3rem;
+}
+
+/* Chart styling */
+.axis path,
+.axis line {
+  stroke: var(--border-color);
+}
+
+.axis text {
+  fill: var(--text-color);
+}
+
+.grid line {
+  stroke: var(--chart-grid-color);
+  stroke-opacity: 0.7;
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+  stroke-width: 0;
+}
+
+/* Position colors */
+.position-1 {
+  fill: var(--primary-color);
+  stroke: var(--primary-color);
+}
+
+.position-2 {
+  fill: var(--tertiary-color);
+  stroke: var(--tertiary-color);
+}
+
+.position-3 {
+  fill: var(--success-color);
+  stroke: var(--success-color);
+}
+
+.position-4 {
+  fill: var(--warning-color);
+  stroke: var(--warning-color);
+}
+
+.position-5 {
+  fill: var(--secondary-color);
+  stroke: var(--secondary-color);
+}
+
+.combined-position {
+  fill: var(--dark-color);
+  stroke: var(--dark-color);
+  stroke-width: 2px;
+}
+
+/* Tooltip styling */
+.tooltip {
+  position: absolute;
+  padding: 10px;
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tooltip.visible {
+  opacity: 0.9;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .visualization-container {
+    height: 300px;
+  }
+  
+  .card-header h2 {
+    font-size: 1rem;
+  }
+  
+  .position-config {
+    padding: 0.5rem;
+  }
+  
+  .form-control, .form-select {
+    font-size: 0.875rem;
+  }
+  
+  .table-sm td, .table-sm th {
+    font-size: 0.75rem;
+  }
+  
+  .accordion-button {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .visualization-container {
+    height: 250px;
+  }
+  
+  .nav-tabs .nav-link {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .card-body {
+    padding: 0.75rem;
+  }
+  
+  .position-config {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Current price line styling */
+.current-price-line {
+  stroke: var(--danger-color);
+  stroke-width: 2px;
+  stroke-dasharray: 5, 5;
+}
+
+.current-price-label {
+  fill: var(--danger-color);
+  font-weight: bold;
+  font-size: 12px;
+}
+
+/* Linearity comparison line styling */
+.ideal-line {
+  stroke: var(--success-color);
+  stroke-width: 2px;
+  stroke-dasharray: 5, 5;
+}
+
+.actual-line {
+  stroke: var(--primary-color);
+  stroke-width: 3px;
+}
+
+/* Loading indicator */
+.loading-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 0, 122, 0.2);
+  border-top: 5px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Dark mode toggle styling */
+.form-check-input:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+/* Help button pulse animation */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+#helpButton {
+  animation: pulse 2s infinite;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .visualization-container {
+    height: 500px;
+    page-break-inside: avoid;
+  }
+  
+  .card {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+  
+  body {
+    background-color: #fff;
+    color: #000;
+  }
+}

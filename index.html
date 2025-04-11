@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uniswap V3 Staggered LP Visualizer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="bg-dark text-white py-3">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1>Uniswap V3 Staggered LP Visualizer</h1>
+                    <p class="lead mb-0">Visualize how staggered and overlapping range LPs create a more linear position</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="d-flex justify-content-md-end">
+                        <div class="form-check form-switch me-3">
+                            <input class="form-check-input" type="checkbox" id="darkModeToggle">
+                            <label class="form-check-label" for="darkModeToggle">Dark Mode</label>
+                        </div>
+                        <button class="btn btn-outline-light btn-sm" id="helpButton">Help</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container py-4">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="h5 mb-0">Current Market Parameters</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="currentPrice">Current ETH Price (USDC)</label>
+                                    <input type="number" class="form-control" id="currentPrice" value="3000">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="feeTier">Fee Tier</label>
+                                    <select class="form-select" id="feeTier">
+                                        <option value="0.01">0.01%</option>
+                                        <option value="0.05" selected>0.05%</option>
+                                        <option value="0.3">0.3%</option>
+                                        <option value="1">1%</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="priceScale">Price Scale</label>
+                                    <select class="form-select" id="priceScale">
+                                        <option value="linear">Linear</option>
+                                        <option value="logarithmic">Logarithmic</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-header bg-success text-white">
+                        <h2 class="h5 mb-0">Position Configuration</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group mb-3">
+                            <label for="numPositions">Number of Positions</label>
+                            <input type="range" class="form-range" id="numPositions" min="1" max="5" value="3">
+                            <div class="d-flex justify-content-between">
+                                <span>1</span>
+                                <span>2</span>
+                                <span>3</span>
+                                <span>4</span>
+                                <span>5</span>
+                            </div>
+                        </div>
+
+                        <div id="positionsContainer">
+                            <!-- Position 1 -->
+                            <div class="position-config mb-3 border-bottom pb-3" id="position1">
+                                <h3 class="h6">Position 1</h3>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="lowerBound1">Lower Bound</label>
+                                        <input type="number" class="form-control form-control-sm" id="lowerBound1" value="2500">
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="upperBound1">Upper Bound</label>
+                                        <input type="number" class="form-control form-control-sm" id="upperBound1" value="3500">
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <label for="liquidity1">Liquidity Allocation (%)</label>
+                                    <input type="range" class="form-range" id="liquidity1" min="1" max="100" value="33">
+                                    <div class="text-end"><span id="liquidity1Value">33%</span></div>
+                                </div>
+                            </div>
+
+                            <!-- Position 2 -->
+                            <div class="position-config mb-3 border-bottom pb-3" id="position2">
+                                <h3 class="h6">Position 2</h3>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="lowerBound2">Lower Bound</label>
+                                        <input type="number" class="form-control form-control-sm" id="lowerBound2" value="2000">
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="upperBound2">Upper Bound</label>
+                                        <input type="number" class="form-control form-control-sm" id="upperBound2" value="3000">
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <label for="liquidity2">Liquidity Allocation (%)</label>
+                                    <input type="range" class="form-range" id="liquidity2" min="1" max="100" value="33">
+                                    <div class="text-end"><span id="liquidity2Value">33%</span></div>
+                                </div>
+                            </div>
+
+                            <!-- Position 3 -->
+                            <div class="position-config mb-3" id="position3">
+                                <h3 class="h6">Position 3</h3>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="lowerBound3">Lower Bound</label>
+                                        <input type="number" class="form-control form-control-sm" id="lowerBound3" value="3000">
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="upperBound3">Upper Bound</label>
+                                        <input type="number" class="form-control form-control-sm" id="upperBound3" value="4000">
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <label for="liquidity3">Liquidity Allocation (%)</label>
+                                    <input type="range" class="form-range" id="liquidity3" min="1" max="100" value="34">
+                                    <div class="text-end"><span id="liquidity3Value">34%</span></div>
+                                </div>
+                            </div>
+
+                            <!-- Position 4 (initially hidden) -->
+                            <div class="position-config mb-3 border-bottom pb-3 d-none" id="position4">
+                                <h3 class="h6">Position 4</h3>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="lowerBound4">Lower Bound</label>
+                                        <input type="number" class="form-control form-control-sm" id="lowerBound4" value="1500">
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="upperBound4">Upper Bound</label>
+                                        <input type="number" class="form-control form-control-sm" id="upperBound4" value="2500">
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <label for="liquidity4">Liquidity Allocation (%)</label>
+                                    <input type="range" class="form-range" id="liquidity4" min="1" max="100" value="25">
+                                    <div class="text-end"><span id="liquidity4Value">25%</span></div>
+                                </div>
+                            </div>
+
+                            <!-- Position 5 (initially hidden) -->
+                            <div class="position-config mb-3 d-none" id="position5">
+                                <h3 class="h6">Position 5</h3>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="lowerBound5">Lower Bound</label>
+                                        <input type="number" class="form-control form-control-sm" id="lowerBound5" value="3500">
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="upperBound5">Upper Bound</label>
+                                        <input type="number" class="form-control form-control-sm" id="upperBound5" value="4500">
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <label for="liquidity5">Liquidity Allocation (%)</label>
+                                    <input type="range" class="form-range" id="liquidity5" min="1" max="100" value="25">
+                                    <div class="text-end"><span id="liquidity5Value">25%</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary w-100" id="updateButton">Update Visualization</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card h-100">
+                    <div class="card-header bg-info text-white">
+                        <ul class="nav nav-tabs card-header-tabs" id="visualizationTabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="liquidityTab" data-bs-toggle="tab" href="#liquidityView">Liquidity</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="deltaTab" data-bs-toggle="tab" href="#deltaView">Delta</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="gammaTab" data-bs-toggle="tab" href="#gammaView">Gamma</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="linearityTab" data-bs-toggle="tab" href="#linearityView">Linearity</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="liquidityView">
+                                <div class="visualization-container" id="liquidityChart">
+                                    <!-- Liquidity chart will be rendered here -->
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="deltaView">
+                                <div class="visualization-container" id="deltaChart">
+                                    <!-- Delta chart will be rendered here -->
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="gammaView">
+                                <div class="visualization-container" id="gammaChart">
+                                    <!-- Gamma chart will be rendered here -->
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="linearityView">
+                                <div class="visualization-container" id="linearityChart">
+                                    <!-- Linearity chart will be rendered here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-warning">
+                        <h2 class="h5 mb-0">Position Analysis</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3 class="h6">Combined Position Metrics</h3>
+                                <table class="table table-sm">
+                                    <tbody>
+                                        <tr>
+                                            <td>Effective Price Range:</td>
+                                            <td id="effectivePriceRange">$2000 - $4000</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Linearity Score:</td>
+                                            <td id="linearityScore">85%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Capital Efficiency:</td>
+                                            <td id="capitalEfficiency">2.5x</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Average Delta:</td>
+                                            <td id="averageDelta">0.45</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <h3 class="h6">Comparison with Single Position</h3>
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Metric</th>
+                                            <th>Staggered</th>
+                                            <th>Single</th>
+                                            <th>Difference</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Linearity</td>
+                                            <td id="staggeredLinearity">85%</td>
+                                            <td id="singleLinearity">65%</td>
+                                            <td id="linearityDiff" class="text-success">+20%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Capital Efficiency</td>
+                                            <td id="staggeredEfficiency">2.5x</td>
+                                            <td id="singleEfficiency">2.0x</td>
+                                            <td id="efficiencyDiff" class="text-success">+0.5x</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Max Gamma</td>
+                                            <td id="staggeredGamma">0.15</td>
+                                            <td id="singleGamma">0.25</td>
+                                            <td id="gammaDiff" class="text-success">-0.10</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <h2 class="h5 mb-0">Educational Resources</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="accordion" id="educationalAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingOne">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                        Understanding Concentrated Liquidity
+                                    </button>
+                                </h2>
+                                <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#educationalAccordion">
+                                    <div class="accordion-body">
+                                        <p>Concentrated liquidity is a key feature of Uniswap V3 that allows liquidity providers to allocate capital within specific price ranges rather than across the entire price spectrum. This significantly improves capital efficiency compared to V2's uniform distribution.</p>
+                                        <p>When you provide liquidity in a concentrated range:</p>
+                                        <ul>
+                                            <li>Your capital is only active when the price is within your specified range</li>
+                                            <li>You earn more fees per unit of capital when the price is within your range</li>
+                                            <li>Your position composition changes as price moves within your range</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingTwo">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                        Delta and Gamma Explained
+                                    </button>
+                                </h2>
+                                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#educationalAccordion">
+                                    <div class="accordion-body">
+                                        <p><strong>Delta (Δ)</strong> represents the rate of change of position value with respect to the price of the underlying asset:</p>
+                                        <ul>
+                                            <li>When price is below range: Delta = 1 (position is 100% token0)</li>
+                                            <li>When price is within range: Delta varies based on position within range</li>
+                                            <li>When price is above range: Delta = 0 (position is 100% token1)</li>
+                                        </ul>
+                                        <p><strong>Gamma (Γ)</strong> represents the rate of change of delta with respect to the price of the underlying asset:</p>
+                                        <ul>
+                                            <li>Gamma is highest near the boundaries of the price range</li>
+                                            <li>Gamma is lower in the middle of the price range</li>
+                                            <li>Multiple overlapping positions can create a more consistent gamma profile</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingThree">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                        Benefits of Staggered Positions
+                                    </button>
+                                </h2>
+                                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#educationalAccordion">
+                                    <div class="accordion-body">
+                                        <p>Staggered and overlapping LP positions offer several advantages:</p>
+                                        <ol>
+                                            <li><strong>More Linear Response:</strong> The combined position behaves more linearly across the price range.</li>
+                                            <li><strong>Distributed Risk:</strong> Gamma risk is spread across multiple price points rather than concentrated at specific boundaries.</li>
+                                            <li><strong>Optimized Fee Generation:</strong> Multiple positions can be strategically placed to maximize fee generation across different price ranges.</li>
+                                            <li><strong>Improved Capital Efficiency:</strong> Capital can be allocated more efficiently across the price spectrum.</li>
+                                            <li><strong>Reduced Impermanent Loss Impact:</strong> The more linear response can help manage impermanent loss more effectively.</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white py-3 mt-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">Uniswap V3 Staggered LP Visualizer</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">Based on <a href="https://uniswap.org/whitepaper-v3.pdf" class="text-white" target="_blank">Uniswap V3 Whitepaper</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Help Modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="helpModalLabel">How to Use This Tool</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>Getting Started</h6>
+                    <p>This tool helps you visualize how staggered and overlapping Uniswap V3 liquidity positions can create a more linear overall position. Follow these steps:</p>
+                    <ol>
+                        <li>Set the current ETH price and fee tier in the Market Parameters section.</li>
+                        <li>Choose the number of positions you want to create (1-5).</li>
+                        <li>Configure each position by setting its price range and liquidity allocation.</li>
+                        <li>Click "Update Visualization" to see the results.</li>
+                        <li>Use the tabs to view different aspects of your positions: Liquidity, Delta, Gamma, and Linearity.</li>
+                    </ol>
+                    <h6>Understanding the Visualizations</h6>
+                    <ul>
+                        <li><strong>Liquidity View:</strong> Shows how liquidity is distributed across the price range for each position and the combined position.</li>
+                        <li><strong>Delta View:</strong> Shows how the position value changes with respect to price changes.</li>
+                        <li><strong>Gamma View:</strong> Shows the rate of change of delta, highlighting areas of high non-linearity.</li>
+                        <li><strong>Linearity View:</strong> Compares the actual position response to an ideal linear response.</li>
+                    </ul>
+                    <h6>Tips for Optimal Results</h6>
+                    <ul>
+                        <li>For maximum linearity, create overlapping positions with staggered boundaries.</li>
+                        <li>Positions with smaller price ranges have higher capital efficiency but also higher gamma.</li>
+                        <li>Distribute liquidity allocation based on expected price volatility.</li>
+                        <li>Compare your staggered approach with a single wide position to see the benefits.</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
